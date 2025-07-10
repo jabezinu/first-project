@@ -14,7 +14,13 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $post = Post::all();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'here are all the posts',
+            'data' => PostResource::collection($post)
+        ], 200);
     }
 
     /**
@@ -49,7 +55,19 @@ class PostController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $post = Post::find($id);
+        if(!$post){
+            return response()->json([
+                'status' => false,
+                'message' => 'Post not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Post fetched successfully',
+            'data' => new PostResource($post)
+       ], 200);
     }
 
     /**
@@ -57,7 +75,34 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|min:3|max:255',
+            'body' => 'required|string|min:5',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'fill all fields',
+                'error' => $validator->error()
+            ], 422);
+        }
+
+        $post = Post::find($id);
+        if(!$post){
+            return response()->json([
+                'status' => false,
+                'message' => 'No data with such an ID'
+            ], 404);
+        }
+
+        $post->update($request->all());
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Post updated successfuly',
+            'data' => new PostResource($post)
+        ], 200);
     }
 
     /**
@@ -65,6 +110,19 @@ class PostController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $post = Post::find($id);
+        if(!$post){
+            return response()->json([
+                'status' => false,
+                'message' => 'No Post with such an Id',
+            ], 404);
+        }
+
+        $post->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Post deleted successfuly'
+        ], 200);
     }
 }
