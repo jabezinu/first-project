@@ -41,13 +41,13 @@ class PostController extends Controller
             ], 422);
         }
 
-            $post = Post::create($request->all());
+        $post = Post::create($request->all());
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Post created successfully',
-                'data' => new PostResource($post)
-            ], 201);
+        return response()->json([
+            'status' => true,
+            'message' => 'Post created successfully',
+            'data' => new PostResource($post)
+        ], 201);
     }
 
     /**
